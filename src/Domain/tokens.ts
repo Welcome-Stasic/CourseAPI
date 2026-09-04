@@ -1,0 +1,1 @@
+export const COURSE_REPOSITORY_TOKEN = Symbol('COURSE_REPOSITORY');
