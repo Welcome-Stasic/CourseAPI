@@ -1,10 +1,31 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule, ObserveInstrument } from './app.module.js';
+import { AppModule } from './app.module.js';
+import express, { Express } from 'express';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { GlobalExceptionFilter } from './Infrastructure/filters/global-exception.filter.js';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    instrument: ObserveInstrument,
-  });
-  await app.listen(process.env.PORT ?? 3000);
+const server: Express = express();
+
+async function bootstrap(): Promise<express.Express> {
+
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
+  app.useGlobalFilters(new GlobalExceptionFilter());
+  const config = new DocumentBuilder()
+    .setTitle('Learning Platform API')
+    .setDescription('API')
+    .setVersion('1.0')
+    .addTag('courses')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api-docs', app, document);
+  app.enableCors();
+  await app.init();
+  return server;
 }
-await bootstrap();
+if (process.env.NODE_ENV !== 'production') {
+  bootstrap().then((server) => {
+    server.listen(process.env.PORT ?? 3000);
+  });
+}
+export default server;

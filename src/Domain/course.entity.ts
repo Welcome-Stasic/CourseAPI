@@ -53,9 +53,15 @@ export class Course {
         this._updatedAt = new Date();
     }
     static create(props: Omit<CourseProps, 'id' | 'createdAt' | 'updatedAt'>) {
-        if ((!props.title || props.title.trim().length === 0) || (props.description.length < 10) || (props.duration < 1 || props.duration > 40)) {
-            throw new Error('Заполните все поля!');
-        };
+      if (!props.title || props.title.trim().length === 0) {
+        throw new Error('Название курса обязательно');
+      }
+      if (!props.description || props.description.trim().length < 10) {
+        throw new Error('Описание должно содержать минимум 10 символов');
+      }
+      if (props.duration < 1 || props.duration > 40) {
+        throw new Error('Длительность должна быть от 1 до 40 часов');
+      }
         const id = crypto.randomUUID();
         return new Course({
             id,
