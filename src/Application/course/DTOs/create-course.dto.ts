@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCourseDto {
-  @ApiProperty({ example: 'NestJS Course' })
+  @ApiProperty()
   title: string;
 
-  @ApiProperty({ example: 'Backend development course' })
+  @ApiProperty()
   description: string;
 
-  @ApiProperty({ example: 24, type: Number })
+  @ApiProperty()
   duration: number;
 }
