@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post } from "@nestjs/common";
-import { CourseResponseDto } from "../../Application/course/dto/course-response.dto.js";
+import { CourseResponseDto } from "../../Application/course/DTOs/course-response.dto.js";
 import { CreateCourseUseCase } from "../../Application/course/use-cases/create-course.use-case.js";
-import { CreateCourseDto } from "../../Application/course/dto/create-course.dto.js";
+import { CreateCourseDto } from "../../Application/course/DTOs/create-course.dto.js";
 import { CourseMapper } from "../../Application/course/mappers/course.mapper.js";
 import { GetCoursesUseCase } from "../../Application/course/use-cases/get-courses.use-case.js";
 

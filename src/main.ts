@@ -7,7 +7,7 @@ import { GlobalExceptionFilter } from './Infrastructure/filters/global-exception
 
 const server: Express = express();
 
-async function bootstrap(): Promise<express.Express> {
+async function bootstrap(): Promise<void> {
 
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
   app.useGlobalFilters(new GlobalExceptionFilter());
@@ -27,11 +27,25 @@ async function bootstrap(): Promise<express.Express> {
   });
   app.enableCors();
   await app.init();
-  return server;
 }
+
+let bootstrapPromise: Promise<void> | undefined;
+
+const initialize = (): Promise<void> => {
+  bootstrapPromise ??= bootstrap();
+  return bootstrapPromise;
+};
+
 if (process.env.NODE_ENV !== 'production') {
-  bootstrap().then((server) => {
+  initialize().then(() => {
     server.listen(process.env.PORT ?? 3000);
   });
 }
-export default server;
+
+export default async function handler(
+  request: express.Request,
+  response: express.Response,
+): Promise<void> {
+  await initialize();
+  server(request, response);
+}
