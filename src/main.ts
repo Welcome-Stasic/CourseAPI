@@ -18,7 +18,7 @@ async function bootstrap(): Promise<express.Express> {
     .addTag('courses')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('swagger', app, document, {
+  SwaggerModule.setup('swagger', app, document, {
     customCssUrl: 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css',
     customJs: [
       'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.min.js',
