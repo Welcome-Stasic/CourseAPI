@@ -4,6 +4,7 @@ import express, { Express } from 'express';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from './Infrastructure/filters/global-exception.filter.js';
+import { ValidationPipe } from '@nestjs/common';
 
 const server: Express = express();
 
@@ -11,6 +12,15 @@ async function bootstrap(): Promise<void> {
 
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
   app.useGlobalFilters(new GlobalExceptionFilter());
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    })
+  )
+
   const config = new DocumentBuilder()
     .setTitle('Learning Platform API')
     .setDescription('API')

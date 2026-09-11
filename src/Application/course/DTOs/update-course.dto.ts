@@ -1,8 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsInt, IsNotEmpty, IsString, Max, Min, MinLength } from 'class-validator';
+import { ApiProperty } from "@nestjs/swagger";
+import { Type } from "class-transformer";
+import { IsInt, IsNotEmpty, IsString, Max, Min, MinLength } from "class-validator";
 
-export class CreateCourseDto {
+export class UpdateCourseDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()

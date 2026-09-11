@@ -4,6 +4,9 @@ import { InMemoryCourseRepository } from "../../Infrastructure/repositories/in-m
 import { CreateCourseUseCase } from "../../Application/course/use-cases/create-course.use-case.js";
 import { GetCoursesUseCase } from "../../Application/course/use-cases/get-courses.use-case.js";
 import { COURSE_REPOSITORY_TOKEN } from "../../Domain/tokens.js";
+import { GetCourseByIdUseCase } from "../../Application/course/use-cases/get-course-by-id.use-case.js";
+import { DeleteCourseUseCase } from "../../Application/course/use-cases/delete-course.use-case.js";
+import { UpdateCourseUsecase } from "../../Application/course/use-cases/update-course.use-case.js";
 
 @Module({
     controllers: [CoursesController],
@@ -13,7 +16,10 @@ import { COURSE_REPOSITORY_TOKEN } from "../../Domain/tokens.js";
             useClass: InMemoryCourseRepository,
         },
         CreateCourseUseCase,
-        GetCoursesUseCase
+        GetCoursesUseCase,
+        GetCourseByIdUseCase,
+        DeleteCourseUseCase,
+        UpdateCourseUsecase
     ],
 })
 export class CoursesModule {};
