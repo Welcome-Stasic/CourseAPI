@@ -23,9 +23,19 @@ async function bootstrap(): Promise<void> {
 
   const config = new DocumentBuilder()
     .setTitle('Learning Platform API')
-    .setDescription('API')
     .setVersion('1.0')
     .addTag('courses')
+    .addTag('auth')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        in: 'header',
+      },
+      'bearer',
+  )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document, {
@@ -34,6 +44,12 @@ async function bootstrap(): Promise<void> {
       'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.min.js',
       'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.min.js',
     ],
+    swaggerOptions: {
+      tagsSorter: (a: string, b: string) => {
+        const order = ['auth', 'courses'];
+        return order.indexOf(a) - order.indexOf(b);
+      },
+    },
   });
   app.enableCors();
   await app.init();
