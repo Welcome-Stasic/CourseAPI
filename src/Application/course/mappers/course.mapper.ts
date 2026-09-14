@@ -1,4 +1,4 @@
-import { Course } from "../../../Domain/course.entity.js";
+import { Course } from "../../../Domain/entitys/course.entity.js";
 import { CourseResponseDto } from "../DTOs/course-response.dto.js";
 
 export class CourseMapper {

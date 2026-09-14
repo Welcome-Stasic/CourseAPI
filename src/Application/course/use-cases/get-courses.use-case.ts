@@ -1,6 +1,6 @@
 import { Inject } from "@nestjs/common";
-import { Course } from "../../../Domain/course.entity.js";
-import type { ICourseRepository } from "../../../Domain/course.repository.interface.js";
+import { Course } from "../../../Domain/entitys/course.entity.js";
+import type { ICourseRepository } from "../../../Domain/repository/course.repository.interface.js";
 import { COURSE_REPOSITORY_TOKEN } from "../../../Domain/tokens.js";
 
 export class GetCoursesUseCase {
