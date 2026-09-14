@@ -1,4 +1,4 @@
-import { Course } from "./course.entity.js";
+import { Course } from "../entitys/course.entity.js";
 
 export interface ICourseRepository {
     save(course: Course): Promise<void>;
