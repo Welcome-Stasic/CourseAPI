@@ -8,7 +8,7 @@ import { GetCourseByIdUseCase } from "../../Application/course/use-cases/get-cou
 import { DeleteCourseUseCase } from "../../Application/course/use-cases/delete-course.use-case.js";
 import { UpdateCourseDto } from "../../Application/course/DTOs/update-course.dto.js";
 import { UpdateCourseUsecase } from "../../Application/course/use-cases/update-course.use-case.js";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard.js";
 
 @ApiTags('courses')
@@ -22,6 +22,7 @@ export class CoursesController {
         private readonly updateCourseUsecase: UpdateCourseUsecase,
     ) {}
     @Post('create')
+    @ApiOperation({ summary: 'Создание курса' })
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     async saveCourse(@Body() CreateCourseDto: CreateCourseDto): Promise<CourseResponseDto> {
@@ -29,16 +30,19 @@ export class CoursesController {
         return CourseMapper.toDto(course);
     }
     @Get('getAll')
+    @ApiOperation({ summary: 'Получить все курсы' })
     async getCourses(): Promise<CourseResponseDto[]> {
         const courses = await this.getCoursesUseCase.execute();
         return courses.map(c => CourseMapper.toDto(c));
     }
     @Get('getById/:id')
+    @ApiOperation({ summary: 'Получить курс по id' })
     async getCourseById(@Param('id') id: string): Promise<CourseResponseDto> {
         const course = await this.getCourseByIdUseCase.execute(id);
         return CourseMapper.toDto(course);
     }
     @Delete('remove/:id')
+    @ApiOperation({ summary: 'Удалить курс по id' })
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @HttpCode(HttpStatus.NO_CONTENT)
@@ -46,6 +50,7 @@ export class CoursesController {
         await this.deleteCourseUseCase.execute(id);
     }
     @Patch('update/:id')
+    @ApiOperation({ summary: 'Обновить курс по id' })
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     async UpdateCourse(@Param('id') id: string, @Body() UpdateCourseDto: UpdateCourseDto): Promise<CourseResponseDto> {
