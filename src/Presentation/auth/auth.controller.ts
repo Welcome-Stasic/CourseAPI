@@ -85,7 +85,7 @@ export class AuthController {
     return this.logoutUseCase.execute(dto);
   }
 
-  @Get('logoutAll')
+  @Post('logoutAll')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @HttpCode(HttpStatus.NO_CONTENT)
