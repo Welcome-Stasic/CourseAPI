@@ -27,6 +27,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import { CurrentUser } from './decorators/current-user.decorator.js';
 import { User } from '../../Domain/entitys/user.entity.js';
 import { MapInterceptor } from '@automapper/nestjs';
+import { LogoutAllUseCase } from '../../Application/auth/use-cases/logout-all.use-case.js';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -36,6 +37,7 @@ export class AuthController {
     private readonly loginUseCase: LoginUseCase,
     private readonly refreshTokensUseCase: RefreshTokenUseCase,
     private readonly logoutUseCase: LogoutUseCase,
+    private readonly LogoutAllUseCase: LogoutAllUseCase,
   ) {}
 
   @Post('register')
@@ -64,14 +66,6 @@ export class AuthController {
     return this.refreshTokensUseCase.execute(dto);
   }
 
-  @Post('logout')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Выход из текущей сессии' })
-  @ApiResponse({ status: 204, description: 'Успех' })
-  async logout(@Body() dto: RefreshTokenDto): Promise<void> {
-    return this.logoutUseCase.execute(dto);
-  }
-
   @Get('me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -81,5 +75,24 @@ export class AuthController {
   @UseInterceptors(MapInterceptor(User, UserResponseDto))
   async me(@CurrentUser() user: User): Promise<UserResponseDto> {
     return user;
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Выход из текущей сессии' })
+  @ApiResponse({ status: 204, description: 'Успех' })
+  async logout(@Body() dto: RefreshTokenDto): Promise<void> {
+    return this.logoutUseCase.execute(dto);
+  }
+
+  @Get('logoutAll')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Выйти со всех устройств' })
+  @ApiResponse({ status: 204, description: 'Все сессии завершены' })
+  @ApiResponse({ status: 401, description: 'Не авторизован' })
+  async logoutAll(@CurrentUser() user: User): Promise<void> {
+    return this.LogoutAllUseCase.execute(user.id);
   }
 }

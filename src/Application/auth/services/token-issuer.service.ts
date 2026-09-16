@@ -22,6 +22,7 @@ export class TokenIssuerService {
         const accessToken = await this.tokenService.signAccessToken({
             sub: user.id,
             email: user.email,
+            ver: user.tokenVersion,
         });
         const jti = this.tokenService.generateJti();
         const refreshToken = await this.tokenService.signRefreshToken({

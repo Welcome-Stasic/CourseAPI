@@ -14,6 +14,7 @@ import { RefreshTokenUseCase } from '../../Application/auth/use-cases/refresh-to
 import { LogoutUseCase } from '../../Application/auth/use-cases/logout.use-case.js';
 import { JwtStrategy } from './strategies/jwt.strategy.js';
 import { UserProfile } from '../../Application/auth/mappers/user.profile.js';
+import { LogoutAllUseCase } from '../../Application/auth/use-cases/logout-all.use-case.js';
 
 @Global()
 @Module({
@@ -38,6 +39,7 @@ import { UserProfile } from '../../Application/auth/mappers/user.profile.js';
         LoginUseCase,
         RefreshTokenUseCase,
         LogoutUseCase,
+        LogoutAllUseCase,
         JwtStrategy,
         UserProfile
     ],

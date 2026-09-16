@@ -7,6 +7,7 @@ import type { StringValue } from 'ms';
 export interface AccessTokenPayload {
   sub: string;
   email: string;
+  ver: number;
 }
 
 export interface RefreshTokenPayload {
