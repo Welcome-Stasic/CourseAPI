@@ -17,7 +17,6 @@ export class User {
     get id(): string {
         return this._id;
     }
-
     get email(): string {
         return this._email;
     }
@@ -29,7 +28,7 @@ export class User {
     get createdAt(): Date {
         return this._createAt;
     }
-
+    
     get updatedAt(): Date {
         return this._updateAt;
     }

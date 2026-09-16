@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Post,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -22,10 +23,10 @@ import { LoginDto } from '../../Application/auth/DTOs/login.dto.js';
 import { RefreshTokenDto } from '../../Application/auth/DTOs/refresh-token.dto.js';
 import { AuthResponseDto } from '../../Application/auth/DTOs/auth-response.dto.js';
 import { UserResponseDto } from '../../Application/auth/DTOs/user-response.dto.js';
-import { UserMapper } from '../../Application/auth/mappers/user.mapper.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import { CurrentUser } from './decorators/current-user.decorator.js';
 import { User } from '../../Domain/entitys/user.entity.js';
+import { MapInterceptor } from '@automapper/nestjs';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -49,7 +50,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Вход в систему' })
   @ApiResponse({ status: 200, type: AuthResponseDto })
-  @ApiResponse({ status: 401, description: 'Неверные учётные данные' })
+  @ApiResponse({ status: 401, description: 'Неверный email или пароль' })
   async login(@Body() dto: LoginDto): Promise<AuthResponseDto> {
     return this.loginUseCase.execute(dto);
   }
@@ -77,7 +78,8 @@ export class AuthController {
   @ApiOperation({ summary: 'Получить текущего пользователя' })
   @ApiResponse({ status: 200, type: UserResponseDto })
   @ApiResponse({ status: 401, description: 'Не авторизован' })
+  @UseInterceptors(MapInterceptor(User, UserResponseDto))
   async me(@CurrentUser() user: User): Promise<UserResponseDto> {
-    return UserMapper.toDto(user);
+    return user;
   }
 }

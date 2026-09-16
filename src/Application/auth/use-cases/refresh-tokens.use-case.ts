@@ -5,8 +5,11 @@ import type { IRefreshTokenRepository } from "../../../Domain/repository/refresh
 import { TokenService } from "../../../Infrastructure/services/token.service.js";
 import { RefreshTokenDto } from "../DTOs/refresh-token.dto.js";
 import { AuthResponseDto } from "../DTOs/auth-response.dto.js";
-import { UserMapper } from "../mappers/user.mapper.js";
 import { TokenIssuerService } from "../services/token-issuer.service.js";
+import { InjectMapper } from "@automapper/nestjs";
+import type { Mapper } from "@automapper/core";
+import { UserResponseDto } from "../DTOs/user-response.dto.js";
+import { User } from "../../../Domain/entitys/user.entity.js";
 
 @Injectable()
 export class RefreshTokenUseCase {
@@ -16,13 +19,13 @@ export class RefreshTokenUseCase {
         @Inject(REFRESH_TOKEN_REPOSITORY_TOKEN)
         private readonly refreshTokenRepository: IRefreshTokenRepository,
         private readonly tokenService: TokenService,
-        private readonly tokenIssuer: TokenIssuerService
+        private readonly tokenIssuer: TokenIssuerService,
+        @InjectMapper() private readonly mapper: Mapper
     ) {}
 
     async execute(dto: RefreshTokenDto): Promise<AuthResponseDto> {
-        let payload;
         try {
-            payload = await this.tokenService.verifyRefreshToken(dto.refreshToken);
+            await this.tokenService.verifyRefreshToken(dto.refreshToken);
         } catch {
             throw new UnauthorizedException('Невалидный refresh-токен');
         }
@@ -33,7 +36,7 @@ export class RefreshTokenUseCase {
         }
         if (storedToken.isRevoked()) {
             await this.refreshTokenRepository.revokeAllForUser(storedToken.userId);
-            throw new UnauthorizedException('Обнаружено повторное использование токена. Все сессии завершены.');
+            throw new UnauthorizedException('Обнаружено повторное использование токена. Все сессии завершены');
         }
         if (storedToken.isExpired()) {
             throw new UnauthorizedException('Refresh-токен истёк');
@@ -48,11 +51,10 @@ export class RefreshTokenUseCase {
 
         const { accessToken, refreshToken } = await this.tokenIssuer.issueForUser(user);
 
-
         return {
             accessToken,
             refreshToken,
-            user: UserMapper.toDto(user),
+            user: this.mapper.map(user, User, UserResponseDto),
         };
     }
 
