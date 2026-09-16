@@ -9,6 +9,7 @@ import { User } from "@prisma/client";
 export interface JwtPayLoad {
     sub: string;
     email: string;
+    ver: number;
 }
 
 @Injectable()
@@ -29,6 +30,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         const user = await this.userRepository.findById(payload.sub);
         if (!user) {
             throw new UnauthorizedException('Пользователь не найден');
+        }
+        if (payload.ver !== user.tokenVersion) {
+            throw new UnauthorizedException('Недействительный токен');
         }
         return user;
     }

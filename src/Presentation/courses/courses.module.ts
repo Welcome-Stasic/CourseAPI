@@ -8,9 +8,9 @@ import { DeleteCourseUseCase } from "../../Application/course/use-cases/delete-c
 import { UpdateCourseUsecase } from "../../Application/course/use-cases/update-course.use-case.js";
 import { PrismaCourseRepository } from "../../Infrastructure/repositories/prisma-course.repository.js";
 import { AuthModule } from "../auth/auth.module.js";
+import { CourseProfile } from "../../Application/course/mappers/course.profile.js";
 
 @Module({
-    imports: [AuthModule],
     controllers: [CoursesController],
     providers: [
         {
@@ -22,6 +22,7 @@ import { AuthModule } from "../auth/auth.module.js";
         GetCourseByIdUseCase,
         DeleteCourseUseCase,
         UpdateCourseUsecase,
+        CourseProfile
     ],
 })
 export class CoursesModule {};

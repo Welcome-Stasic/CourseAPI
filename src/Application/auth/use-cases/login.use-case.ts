@@ -7,8 +7,11 @@ import type { IUserRepository } from '../../../Domain/repository/user.repository
 import { PasswordHasher } from '../../../Infrastructure/services/password-hasher.service.js';
 import { LoginDto } from '../DTOs/login.dto.js';
 import { AuthResponseDto } from '../DTOs/auth-response.dto.js';
-import { UserMapper } from '../mappers/user.mapper.js';
 import { TokenIssuerService } from '../services/token-issuer.service.js';
+import { UserResponseDto } from '../DTOs/user-response.dto.js';
+import { User } from '../../../Domain/entitys/user.entity.js';
+import { type Mapper } from '@automapper/core';
+import { InjectMapper } from '@automapper/nestjs';
 
 const DUMMY_HASH = process.env.DUMMY_HASH || '$2b$10$IwRR5w/QCfblYNAweuPSD.0VwznDhPHyha20T2vWuuL7M7AIrihpq';
 
@@ -18,7 +21,8 @@ export class LoginUseCase {
         @Inject(USER_REPOSITORY_TOKEN)
         private readonly userRepository: IUserRepository,
         private readonly passwordHasher: PasswordHasher,
-        private readonly tokenIssuer: TokenIssuerService
+        private readonly tokenIssuer: TokenIssuerService,
+        @InjectMapper() private readonly mapper: Mapper
     ) {}
     async execute(dto: LoginDto): Promise<AuthResponseDto> {
         const user = await this.userRepository.findByEmail(dto.email);
@@ -37,7 +41,7 @@ export class LoginUseCase {
         return {
             accessToken,
             refreshToken,
-            user: UserMapper.toDto(user),
+            user: this.mapper.map(user, User, UserResponseDto),
         };
     }
 }

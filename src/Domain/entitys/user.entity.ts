@@ -4,6 +4,7 @@ export class User {
     private readonly _id: string;
     private _email: string;
     private readonly _passwordHash: string;
+    private _tokenVersion: number;
     private readonly _createAt: Date;
     private _updateAt: Date;
 
@@ -11,30 +12,22 @@ export class User {
         this._id = props.id;
         this._email = props.email;
         this._passwordHash = props.passwordHash;
+        this._tokenVersion = props.tokenVersion ?? 0;
         this._createAt = props.createdAt ?? new Date();
         this._updateAt = props.updatedAt ?? new Date();
     }
-    get id(): string {
-        return this._id;
-    }
+    get id(): string { return this._id; }
+    get email(): string { return this._email; }
+    get passwordHash(): string { return this._passwordHash; }
+    get tokenVersion(): number { return this._tokenVersion; }
+    get createdAt(): Date { return this._createAt; }
+    get updatedAt(): Date { return this._updateAt; }
 
-    get email(): string {
-        return this._email;
+    incrementTokenVersion(): void {
+        this._tokenVersion += 1;
+        this._updateAt = new Date();
     }
-
-    get passwordHash(): string {
-        return this._passwordHash;
-    }
-
-    get createdAt(): Date {
-        return this._createAt;
-    }
-
-    get updatedAt(): Date {
-        return this._updateAt;
-    }
-
-    static create(props: Omit<UserProps, 'id'| 'createAt' | 'updateAt'>): User {
+    static create(props: Omit<UserProps, 'id'| 'createdAt' | 'updateAt'>): User {
         const email = props.email.trim().toLowerCase();
         if (!email || !email.includes('@')) {
             throw new Error('Некорректный email');

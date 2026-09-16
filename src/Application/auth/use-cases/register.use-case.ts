@@ -5,8 +5,10 @@ import { PasswordHasher } from "../../../Infrastructure/services/password-hasher
 import { RegisterDTO } from "../DTOs/register.dto.js";
 import { AuthResponseDto } from "../DTOs/auth-response.dto.js";
 import { User } from "../../../Domain/entitys/user.entity.js";
-import { UserMapper } from "../mappers/user.mapper.js";
 import { TokenIssuerService } from "../services/token-issuer.service.js";
+import { UserResponseDto } from "../DTOs/user-response.dto.js";
+import { type Mapper } from "@automapper/core";
+import { InjectMapper } from "@automapper/nestjs";
 
 @Injectable()
 export class RegisterUseCase {
@@ -14,7 +16,8 @@ export class RegisterUseCase {
         @Inject(USER_REPOSITORY_TOKEN)
         private readonly userRepository: IUserRepository,
         private readonly passwordHasher: PasswordHasher,
-        private readonly tokenIssuer: TokenIssuerService
+        private readonly tokenIssuer: TokenIssuerService,
+        @InjectMapper() private readonly mapper: Mapper
     ) {}
     
     async execute(dto: RegisterDTO): Promise<AuthResponseDto> {
@@ -34,7 +37,7 @@ export class RegisterUseCase {
         return {
             accessToken,
             refreshToken,
-            user: UserMapper.toDto(user),
+            user: this.mapper.map(user, User, UserResponseDto),
         }
     }
 

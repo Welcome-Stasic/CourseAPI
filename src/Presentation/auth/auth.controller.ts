@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Post,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -22,10 +23,11 @@ import { LoginDto } from '../../Application/auth/DTOs/login.dto.js';
 import { RefreshTokenDto } from '../../Application/auth/DTOs/refresh-token.dto.js';
 import { AuthResponseDto } from '../../Application/auth/DTOs/auth-response.dto.js';
 import { UserResponseDto } from '../../Application/auth/DTOs/user-response.dto.js';
-import { UserMapper } from '../../Application/auth/mappers/user.mapper.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import { CurrentUser } from './decorators/current-user.decorator.js';
 import { User } from '../../Domain/entitys/user.entity.js';
+import { MapInterceptor } from '@automapper/nestjs';
+import { LogoutAllUseCase } from '../../Application/auth/use-cases/logout-all.use-case.js';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -35,6 +37,7 @@ export class AuthController {
     private readonly loginUseCase: LoginUseCase,
     private readonly refreshTokensUseCase: RefreshTokenUseCase,
     private readonly logoutUseCase: LogoutUseCase,
+    private readonly LogoutAllUseCase: LogoutAllUseCase,
   ) {}
 
   @Post('register')
@@ -49,7 +52,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Вход в систему' })
   @ApiResponse({ status: 200, type: AuthResponseDto })
-  @ApiResponse({ status: 401, description: 'Неверные учётные данные' })
+  @ApiResponse({ status: 401, description: 'Неверный email или пароль' })
   async login(@Body() dto: LoginDto): Promise<AuthResponseDto> {
     return this.loginUseCase.execute(dto);
   }
@@ -63,6 +66,17 @@ export class AuthController {
     return this.refreshTokensUseCase.execute(dto);
   }
 
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Получить текущего пользователя' })
+  @ApiResponse({ status: 200, type: UserResponseDto })
+  @ApiResponse({ status: 401, description: 'Не авторизован' })
+  @UseInterceptors(MapInterceptor(User, UserResponseDto))
+  async me(@CurrentUser() user: User): Promise<UserResponseDto> {
+    return user;
+  }
+
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Выход из текущей сессии' })
@@ -71,13 +85,14 @@ export class AuthController {
     return this.logoutUseCase.execute(dto);
   }
 
-  @Get('me')
+  @Get('logoutAll')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Получить текущего пользователя' })
-  @ApiResponse({ status: 200, type: UserResponseDto })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Выйти со всех устройств' })
+  @ApiResponse({ status: 204, description: 'Все сессии завершены' })
   @ApiResponse({ status: 401, description: 'Не авторизован' })
-  async me(@CurrentUser() user: User): Promise<UserResponseDto> {
-    return UserMapper.toDto(user);
+  async logoutAll(@CurrentUser() user: User): Promise<void> {
+    return this.LogoutAllUseCase.execute(user.id);
   }
 }
